@@ -1,41 +1,35 @@
-import e from 'express';
-import React from 'react';
-
-type FormFieldType = {
-    label: string,
-    fieldType: 'text' | 'email' | 'password' | 'password_repeat',
-}
-
-type DataObjectType = {
-    formFields: Array<FormFieldType>,
-    submitBtnLabel: 'string',
-}
+import React, { SyntheticEvent } from "react";
+import { DataObjectType } from "../../mockObjects/mockObjects";
+import EmailField from "./EmailField/EmailField";
 
 type PropTypes = {
-    dataObject: DataObjectType,
-}
+  dataObject: DataObjectType;
+};
 
 function FormGenerator(props: PropTypes): JSX.Element {
-    const { dataObject } = props;
-    const { formFields, submitBtnLabel} = dataObject;
+  const { dataObject } = props;
+  const { formFields, submitBtnLabel } = dataObject;
 
-    function onSumbit(e: React.SyntheticEvent):void {
-        e.preventDefault();
-        console.log('submit pressed');
-    }
+  function onSumbit(e: SyntheticEvent): void {
+    e.preventDefault();
+    console.log("submit pressed");
+  }
 
-    return (
-        <section>
-            <form onSubmit={onSumbit}>
-                <>
-                    {formFields.map((field) => {
-                        // create a components for a different fields and add logic here
-                    })}
-                    <button type='submit'>{submitBtnLabel}</button>
-                </>
-            </form>
-        </section>
-    )
+  return (
+    <form onSubmit={onSumbit}>
+      <>
+        {formFields.map((field) => {
+          return <EmailField field={field} />;
+        })}
+        <button
+          type="submit"
+          className="px-4 py-2 mt-3 shadow-sm text-gray-900 self-center bg-white border-gray-900"
+        >
+          {submitBtnLabel}
+        </button>
+      </>
+    </form>
+  );
 }
 
 export default FormGenerator;
