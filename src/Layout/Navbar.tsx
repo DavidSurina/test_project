@@ -12,13 +12,6 @@ function Navbar(): JSX.Element {
         >
           Mock 1
         </Link>
-        <Link
-          to="mock2"
-          aria-label="link-mock2"
-          className="border-r-2 border-gray-900 p-2 hover:text-gray-600"
-        >
-          Mock 2
-        </Link>
       </nav>
       <Outlet />
     </>
