@@ -1,15 +1,22 @@
-import React, { SyntheticEvent, useEffect, useState } from "react";
-import { DataObjectType } from "../../globals/mockObjects";
+import React, { ChangeEvent, SyntheticEvent, useEffect, useState } from "react";
+import { DataObjectType, validation } from "../../globals/mockObjects";
 import InputField from "./InputField/InputField";
 
 type PropTypes = {
   dataObject: DataObjectType;
 };
 
+type ValuesType = Record<string, string>
+type ErrorsType = Record<string, Array<string>>
+
+
 function FormGenerator(props: PropTypes): JSX.Element {
   const { dataObject } = props;
-  const { formFields, submitBtnLabel } = dataObject;
-  const [fields, setFields] = useState(formFields);
+  const { formFields: fields, submitBtnLabel } = dataObject;
+
+
+  const [values, setValues] = useState<ValuesType>({})
+  const [errors, setErrors] = useState<ErrorsType>({})
   const [isDisabled, setIsDisabled] = useState(true);
 
   function onSumbit(e: SyntheticEvent): void {
@@ -17,18 +24,26 @@ function FormGenerator(props: PropTypes): JSX.Element {
     console.log("submitted");
   }
 
-  useEffect(() => {
-    const isNoError = fields.filter(
-      (field) => field.errors.length !== 0 && field.value.length !== 0
-    );
-    const isAllValid = fields.filter((field) => field.isValid === true);
-    console.log("triggered", isNoError.length, isAllValid.length, isDisabled);
-    if (isNoError.length === 0 && isAllValid.length === fields.length) {
-      setIsDisabled(false);
-    } else {
-      setIsDisabled(true);
-    }
-  }, [fields]);
+  const handleInputChange = (name: string, value: string) => {
+    setValues(prev=>({...prev, [name]: value}))
+  }
+
+  const handleBlur = (name: string) => {
+    let inputErrors: Array<string> = [];
+    const field = fields.find(item => item.name === name);
+
+    if (!field) return;
+
+    Object.entries(field.validationRules).forEach(([ruleKey, rule]) => {
+      const { validate, errorMessage } = validation[ruleKey];
+
+      if (!validate(values[name], rule)){
+        inputErrors = [...inputErrors, errorMessage];
+      }
+    })
+
+    setErrors(prev=> ({...prev, [name]: inputErrors}));
+  }
 
   return (
     <form onSubmit={onSumbit}>
@@ -38,9 +53,12 @@ function FormGenerator(props: PropTypes): JSX.Element {
             <InputField
               field={field}
               fields={fields}
-              setFields={setFields}
+              onBlur={() => handleBlur(field.name)}
+              onChange={(e:ChangeEvent<HTMLInputElement>)=>handleInputChange(field.name, e.target.value)}
               index={index}
+              errors={errors[field.name]}
               key={index}
+              value={values[field.name]}
             />
           );
         })}
