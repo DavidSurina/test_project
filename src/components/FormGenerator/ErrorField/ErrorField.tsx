@@ -1,13 +1,13 @@
 import React from "react";
 
 type PropTypes = {
-  errors: Array<string>;
+  errors: string[];
 };
 
 function ErrorField(props: PropTypes): JSX.Element {
   const { errors } = props;
 
-  if (errors.length === 0) {
+  if (!errors) {
     return <span className="h4" />;
   }
 
