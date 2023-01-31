@@ -58,7 +58,7 @@ export type ValidationRulesType = {
 export type FormFieldType = {
   name: string;
   label: string;
-  fieldType: "text" | "email" | "password" | "password_repeat";
+  fieldType: "text" | "email" | "password";
   validationRules: ValidationRulesType;
 };
 
@@ -93,6 +93,18 @@ const mockPw: FormFieldType = {
         errorMessage: "Must contain special character",
       },
     ],
+  },
+};
+
+const mockPwRepeat: FormFieldType = {
+  name: "password_repeat",
+  label: "Password repeat",
+  fieldType: "password",
+  validationRules: {
+    minLength: 8,
+    maxLength: 20,
+    isRequired: true,
+    patterns: [],
   },
 };
 
@@ -132,6 +144,6 @@ const mockName: FormFieldType = {
 };
 
 export const mockObj_registration: DataObjectType = {
-  formFields: [mockEmail, mockName, mockPw],
+  formFields: [mockEmail, mockName, mockPw, mockPwRepeat],
   submitBtnLabel: "Registration",
 };
