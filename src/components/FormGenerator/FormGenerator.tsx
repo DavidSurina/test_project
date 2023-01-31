@@ -13,8 +13,8 @@ type PropTypes = {
   dataObject: DataObjectType;
 };
 
-type ValuesType = Record<string, string>;
-type ErrorsType = Record<string, Array<string>>;
+export type ValuesType = Record<string, string>;
+export type ErrorsType = Record<string, Array<string>>;
 
 function FormGenerator(props: PropTypes): JSX.Element {
   const { dataObject } = props;
@@ -24,6 +24,7 @@ function FormGenerator(props: PropTypes): JSX.Element {
   const [errors, setErrors] = useState<ErrorsType>({});
   const [isDisabled, setIsDisabled] = useState(true);
 
+  // checks if submit should be disabled
   useEffect(() => {
     if (
       Object.keys(values).length === dataObject.formFields.length &&
@@ -56,6 +57,17 @@ function FormGenerator(props: PropTypes): JSX.Element {
     const field = fields.find((item) => item.name === name);
 
     if (!field) return;
+
+    // if the field is password repeat - check for same value in password field
+    if (field.name === "password_repeat") {
+      const pwInput = values["password"];
+      if (
+        typeof pwInput === "string" &&
+        pwInput !== values["password_repeat"]
+      ) {
+        inputErrors = [...inputErrors, "Field does not have same value."];
+      }
+    }
 
     Object.entries(field.validationRules).forEach(([ruleKey, rule]) => {
       if (ruleKey === "patterns") {
