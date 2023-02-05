@@ -41,6 +41,9 @@ function FormGenerator(props: PropTypes): JSX.Element {
 
   // checks if submit should be disabled
   useEffect(() => {
+    const wasEveryFieldUsed = Object.values(wasFieldUsed).every(
+      (v) => v === true
+    );
     if (
       Object.keys(values).length === dataObject.formFields.length &&
       Object.keys(errors).length === dataObject.formFields.length &&
