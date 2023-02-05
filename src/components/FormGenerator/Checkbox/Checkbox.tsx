@@ -9,15 +9,16 @@ interface PropTypes {
 
 function Checkbox(props: HTMLProps<HTMLInputElement> & PropTypes): JSX.Element {
   const { errors, field } = props;
-  const { label, name } = field;
+  const { label, name, fieldType } = field;
   return (
     <div className="flex flex-col justify-evenly m-4">
       <div className="flex flex-row justify-start">
         <input
-          placeholder="checkbox"
-          type="checkbox"
+          placeholder={fieldType}
+          type={fieldType}
           className="pr-4"
           id={name}
+          {...props}
         />
         <span className="ml-2">{label}</span>
       </div>
