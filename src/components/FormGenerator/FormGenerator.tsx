@@ -45,8 +45,7 @@ function FormGenerator(props: PropTypes): JSX.Element {
       (v) => v === true
     );
     if (
-      Object.keys(values).length === dataObject.formFields.length &&
-      Object.keys(errors).length === dataObject.formFields.length &&
+      wasEveryFieldUsed &&
       Object.values(errors).every((item) => item.length === 0)
     ) {
       setIsDisabled(false);
