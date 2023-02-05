@@ -15,6 +15,7 @@ type PropTypes = {
 
 export type ValuesType = Record<string, string>;
 export type ErrorsType = Record<string, Array<string>>;
+export type WasFieldUsedType = Record<string, boolean>;
 
 function FormGenerator(props: PropTypes): JSX.Element {
   const { dataObject } = props;
@@ -22,7 +23,21 @@ function FormGenerator(props: PropTypes): JSX.Element {
 
   const [values, setValues] = useState<ValuesType>({});
   const [errors, setErrors] = useState<ErrorsType>({});
+  const [wasFieldUsed, setWasFieldUsed] = useState<WasFieldUsedType>({});
   const [isDisabled, setIsDisabled] = useState(true);
+
+  // creates an object for every required field
+  useEffect(() => {
+    const requiredFields: WasFieldUsedType = {};
+
+    fields.forEach((field) => {
+      if (field.validationRules.isRequired) {
+        requiredFields[field.name] = false;
+      }
+    });
+
+    setWasFieldUsed(requiredFields);
+  }, []);
 
   // checks if submit should be disabled
   useEffect(() => {
