@@ -1,13 +1,9 @@
+import { validatePattern } from "./functions";
+
 export type PatternType = {
   pattern: string;
   errorMessage: string;
 };
-
-export function patternValidate(pattern: string, value: string) {
-  const regExp = new RegExp(pattern);
-  console.log(regExp.test(value), regExp, value);
-  return regExp.test(value);
-}
 
 export const validation: Record<
   string,
@@ -16,7 +12,7 @@ export const validation: Record<
     validate: (
       value: string | number,
       parameters?: unknown
-    ) => boolean | typeof patternValidate;
+    ) => boolean | typeof validatePattern;
   }
 > = {
   minLength: {
