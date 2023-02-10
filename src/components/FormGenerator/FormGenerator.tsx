@@ -17,10 +17,16 @@ function FormGenerator(props: PropTypes): JSX.Element {
 
   const [isDisabled, setIsDisabled] = useState(true);
 
-  const { handleChange, handleSumbit, values, errors, wasFieldTouched } =
-    useForm({
-      dataObject,
-    });
+  const {
+    handleChange,
+    handleSumbit,
+    values,
+    errors,
+    wasFieldTouched,
+    handleBlur,
+  } = useForm({
+    dataObject,
+  });
 
   return (
     <form onSubmit={handleSumbit}>
@@ -40,7 +46,7 @@ function FormGenerator(props: PropTypes): JSX.Element {
           return (
             <InputField
               field={field}
-              onBlur={() => handleBlur(field.name)}
+              onBlur={(e) => handleBlur(e)}
               onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange(e)}
               errors={errors[field.name]}
               key={index}
