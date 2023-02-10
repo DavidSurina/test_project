@@ -14,7 +14,6 @@ export function validatePatterns(value: string, patterns: PatternType[]) {
 
 export function validatePattern(pattern: string, value: string) {
   const regExp = new RegExp(pattern);
-  console.log(regExp.test(value), regExp, value);
 
   return regExp.test(value);
 }
