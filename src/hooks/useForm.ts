@@ -1,4 +1,4 @@
-import { useState, ChangeEvent, FormEvent } from "react";
+import { useState, ChangeEvent, FormEvent, FocusEvent } from "react";
 import {
   ErrorsType,
   ValuesType,
@@ -7,6 +7,7 @@ import {
 import { validatePatterns } from "../globals/functions";
 import {
   DataObjectType,
+  FormFieldType,
   PatternType,
   validation,
 } from "../globals/mockObjects";
@@ -33,6 +34,42 @@ const useForm = <T>({ dataObject, onSumbit }: UseFormProps<T>) => {
     setValues((prev) => ({ ...prev, [name]: value }));
   };
 
+  const validateField = (field: FormFieldType, value?: string | number) => {
+    let fieldErrors: string[] = [];
+    const _value = value ? value : values[field.name];
+    if (field.validationRules.isRequired && !_value) {
+      fieldErrors = ["Field is required"];
+      return fieldErrors;
+    }
+
+    if (field.name === "password_repeat") {
+      const pwInput = values["password"];
+      if (
+        typeof pwInput === "string" &&
+        pwInput !== values["password_repeat"]
+      ) {
+        fieldErrors = [...fieldErrors, "Field does not have same value."];
+      }
+    }
+
+    Object.entries(field.validationRules).forEach(([ruleKey, rule]) => {
+      if (ruleKey === "patterns") {
+        const patternErrors = validatePatterns(
+          value as string,
+          rule as PatternType[]
+        );
+        fieldErrors = [...fieldErrors, ...patternErrors];
+      } else {
+        const { validate, errorMessage } = validation[ruleKey];
+        if (!validate(values[field.name], rule)) {
+          fieldErrors = [...fieldErrors, errorMessage];
+        }
+      }
+    });
+
+    return fieldErrors;
+  };
+
   const validateAllFields = () => {
     if (errors) {
       setErrors({});
@@ -40,41 +77,22 @@ const useForm = <T>({ dataObject, onSumbit }: UseFormProps<T>) => {
     let allErrors: ErrorsType = {};
 
     formFields.forEach((field) => {
-      let inputErrors: string[] = [];
-      if (field.validationRules.isRequired && !values[field.name]) {
-        inputErrors = [...inputErrors, "Field is required"];
-        allErrors = { ...allErrors, [field.name]: ["Field is required"] };
-        return;
-      }
-      if (field.name === "password_repeat") {
-        const pwInput = values["password"];
-        if (
-          typeof pwInput === "string" &&
-          pwInput !== values["password_repeat"]
-        ) {
-          inputErrors = [...inputErrors, "Field does not have same value."];
-        }
-      }
-
-      Object.entries(field.validationRules).forEach(([ruleKey, rule]) => {
-        if (ruleKey === "patterns") {
-          const patternErrors = validatePatterns(
-            values[field.name],
-            rule as PatternType[]
-          );
-          inputErrors = [...inputErrors, ...patternErrors];
-        } else {
-          const { validate, errorMessage } = validation[ruleKey];
-          if (!validate(values[field.name], rule)) {
-            inputErrors = [...inputErrors, errorMessage];
-          }
-        }
-      });
+      const inputErrors = validateField(field);
 
       allErrors = { ...allErrors, [field.name]: inputErrors };
     });
 
     return allErrors;
+  };
+
+  const handleBlur = (e: FocusEvent<HTMLInputElement>) => {
+    const { name, value } = e.currentTarget;
+    const field = formFields.find((f) => f.name === name);
+
+    const errors = validateField(field as FormFieldType, value);
+    if (errors.length > 0) {
+      setErrors((prev) => ({ ...prev, [name]: errors }));
+    }
   };
 
   const handleSumbit = (e: FormEvent) => {
@@ -91,11 +109,14 @@ const useForm = <T>({ dataObject, onSumbit }: UseFormProps<T>) => {
     }
   };
 
-  // const handleBlur = (e: FormEvent) => {
-  //     const { name, value } = e.currentTarget;
-  // }
-
-  return { handleChange, handleSumbit, values, errors, wasFieldTouched };
+  return {
+    handleChange,
+    handleSumbit,
+    values,
+    errors,
+    wasFieldTouched,
+    handleBlur,
+  };
 };
 
 export default useForm;
