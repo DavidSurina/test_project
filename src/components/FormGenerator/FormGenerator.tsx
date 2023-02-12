@@ -1,10 +1,10 @@
 import React, { ChangeEvent } from "react";
 
 import InputField from "./InputField/InputField";
-
-import { DataObjectType } from "../../globals/mockObjects";
 import Checkbox from "./Checkbox/Checkbox";
+
 import useForm from "../../hooks/useForm";
+import { DataObjectType } from "../../globals/mockObjects";
 import { ValuesType } from "./types";
 
 type PropTypes = {
