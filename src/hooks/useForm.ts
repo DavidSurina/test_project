@@ -1,9 +1,5 @@
 import { useState, ChangeEvent, FormEvent, FocusEvent } from "react";
-import {
-  ErrorsType,
-  ValuesType,
-  WasFieldTouchedType,
-} from "../components/FormGenerator/types";
+import { ErrorsType, ValuesType } from "../components/FormGenerator/types";
 import { validatePatterns } from "../globals/functions";
 import {
   DataObjectType,
@@ -14,36 +10,38 @@ import {
 
 export type UseFormProps<T> = {
   dataObject: DataObjectType;
-  onSumbit?: (values: T) => void;
+  onSubmit?: (values: T) => void;
 };
 
-const useForm = <T>({ dataObject, onSumbit }: UseFormProps<T>) => {
+const useForm = <T>({ dataObject, onSubmit }: UseFormProps<T>) => {
   const { formFields } = dataObject;
-  const requiredFieldsCount = formFields.map(
-    (f) => f.validationRules.isRequired
-  );
+
   const [values, setValues] = useState<ValuesType>({});
   const [errors, setErrors] = useState<ErrorsType>({});
-  const [wasFieldTouched, setWasFieldTouched] = useState<WasFieldTouchedType>(
-    {}
-  );
-  const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = e.target;
-    console.log(id, value, e.target);
-    setValues((prev) => ({ ...prev, [id]: value }));
+    const { id, value, checked, type } = e.target;
+
+    if (type === "checkbox") {
+      setValues((prev) => ({ ...prev, [id]: `${checked}` }));
+    } else {
+      setValues((prev) => ({ ...prev, [id]: value }));
+    }
   };
 
   const validateField = (field: FormFieldType, value?: string | number) => {
     console.log("validate field");
     let fieldErrors: string[] = [];
     const _value = value ? value : values[field.name];
-    if (field.validationRules.isRequired && !_value) {
+    if (
+      (field.validationRules.isRequired && !_value) ||
+      (field.fieldType === "checkbox" && values[field.name] !== "true")
+    ) {
+      console.log("triggered", values);
       fieldErrors = ["Field is required"];
       return fieldErrors;
     }
-    console.log("got past first");
+
     if (field.name === "password_repeat") {
       const pwInput = values["password"];
       if (
@@ -57,7 +55,7 @@ const useForm = <T>({ dataObject, onSumbit }: UseFormProps<T>) => {
     Object.entries(field.validationRules).forEach(([ruleKey, rule]) => {
       if (ruleKey === "patterns") {
         const patternErrors = validatePatterns(
-          value as string,
+          _value as string,
           rule as PatternType[]
         );
         fieldErrors = [...fieldErrors, ...patternErrors];
@@ -68,7 +66,6 @@ const useForm = <T>({ dataObject, onSumbit }: UseFormProps<T>) => {
         }
       }
     });
-    console.log(fieldErrors);
     return fieldErrors;
   };
 
@@ -88,16 +85,18 @@ const useForm = <T>({ dataObject, onSumbit }: UseFormProps<T>) => {
   };
 
   const handleBlur = (e: FocusEvent<HTMLInputElement>) => {
-    const { id, value } = e.currentTarget;
+    const { id, value, checked } = e.currentTarget;
     const field = formFields.find((f) => f.name === id);
     setErrors((prev) => ({ ...prev, [id]: [] }));
+    let currentErrors: string[] = [];
+    if (field?.fieldType === "checkbox") {
+      currentErrors = checked ? [] : ["Field is required"];
+    } else {
+      currentErrors = validateField(field as FormFieldType, value);
+    }
 
-    console.log("blur triggered");
-
-    const errors = validateField(field as FormFieldType, value);
-    console.log(errors);
-    if (errors.length > 0) {
-      setErrors((prev) => ({ ...prev, [id]: errors }));
+    if (currentErrors.length > 0) {
+      setErrors((prev) => ({ ...prev, [id]: currentErrors }));
     }
   };
 
@@ -105,14 +104,14 @@ const useForm = <T>({ dataObject, onSumbit }: UseFormProps<T>) => {
     e.preventDefault();
     // validation
     const validate = validateAllFields();
-    // ustawienie disabled
-
-    if (Object.keys(validate).length > 0) {
+    const submitCondition =
+      Object.values(validate).filter((v) => v.length > 0).length > 0;
+    if (submitCondition) {
       setErrors(validate);
       return;
-    } else if (onSumbit) {
+    } else if (onSubmit) {
       // on submit
-      // onSumbit(values);
+      onSubmit(values);
     }
   };
 
@@ -121,9 +120,7 @@ const useForm = <T>({ dataObject, onSumbit }: UseFormProps<T>) => {
     handleSumbit,
     values,
     errors,
-    wasFieldTouched,
     handleBlur,
-    isSubmitDisabled,
   };
 };
 
