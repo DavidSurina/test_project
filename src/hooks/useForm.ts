@@ -21,7 +21,7 @@ const useForm = <T>({ dataObject, onSumbit }: UseFormProps<T>) => {
   const { formFields } = dataObject;
   const requiredFieldsCount = formFields.map(
     (f) => f.validationRules.isRequired
-  ).length;
+  );
   const [values, setValues] = useState<ValuesType>({});
   const [errors, setErrors] = useState<ErrorsType>({});
   const [wasFieldTouched, setWasFieldTouched] = useState<WasFieldTouchedType>(
@@ -30,8 +30,9 @@ const useForm = <T>({ dataObject, onSumbit }: UseFormProps<T>) => {
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setValues((prev) => ({ ...prev, [name]: value }));
+    const { id, value } = e.target;
+    console.log(id, value, e.target);
+    setValues((prev) => ({ ...prev, [id]: value }));
   };
 
   const validateField = (field: FormFieldType, value?: string | number) => {
@@ -86,12 +87,14 @@ const useForm = <T>({ dataObject, onSumbit }: UseFormProps<T>) => {
   };
 
   const handleBlur = (e: FocusEvent<HTMLInputElement>) => {
-    const { name, value } = e.currentTarget;
-    const field = formFields.find((f) => f.name === name);
+    const { id, value } = e.currentTarget;
+    const field = formFields.find((f) => f.name === id);
+
+    console.log("blur triggered");
 
     const errors = validateField(field as FormFieldType, value);
     if (errors.length > 0) {
-      setErrors((prev) => ({ ...prev, [name]: errors }));
+      setErrors((prev) => ({ ...prev, [id]: errors }));
     }
   };
 
@@ -105,7 +108,7 @@ const useForm = <T>({ dataObject, onSumbit }: UseFormProps<T>) => {
       setErrors(validate);
       return;
     } else if (onSumbit) {
-      onSumbit(values);
+      // onSumbit(values);
     }
   };
 
@@ -116,6 +119,7 @@ const useForm = <T>({ dataObject, onSumbit }: UseFormProps<T>) => {
     errors,
     wasFieldTouched,
     handleBlur,
+    isSubmitDisabled,
   };
 };
 
