@@ -36,13 +36,14 @@ const useForm = <T>({ dataObject, onSumbit }: UseFormProps<T>) => {
   };
 
   const validateField = (field: FormFieldType, value?: string | number) => {
+    console.log("validate field");
     let fieldErrors: string[] = [];
     const _value = value ? value : values[field.name];
     if (field.validationRules.isRequired && !_value) {
       fieldErrors = ["Field is required"];
       return fieldErrors;
     }
-
+    console.log("got past first");
     if (field.name === "password_repeat") {
       const pwInput = values["password"];
       if (
@@ -67,7 +68,7 @@ const useForm = <T>({ dataObject, onSumbit }: UseFormProps<T>) => {
         }
       }
     });
-
+    console.log(fieldErrors);
     return fieldErrors;
   };
 
@@ -89,10 +90,12 @@ const useForm = <T>({ dataObject, onSumbit }: UseFormProps<T>) => {
   const handleBlur = (e: FocusEvent<HTMLInputElement>) => {
     const { id, value } = e.currentTarget;
     const field = formFields.find((f) => f.name === id);
+    setErrors((prev) => ({ ...prev, [id]: [] }));
 
     console.log("blur triggered");
 
     const errors = validateField(field as FormFieldType, value);
+    console.log(errors);
     if (errors.length > 0) {
       setErrors((prev) => ({ ...prev, [id]: errors }));
     }
@@ -100,14 +103,15 @@ const useForm = <T>({ dataObject, onSumbit }: UseFormProps<T>) => {
 
   const handleSumbit = (e: FormEvent) => {
     e.preventDefault();
-    //validacja
+    // validation
     const validate = validateAllFields();
-    //ustawienie disabled
+    // ustawienie disabled
 
     if (Object.keys(validate).length > 0) {
       setErrors(validate);
       return;
     } else if (onSumbit) {
+      // on submit
       // onSumbit(values);
     }
   };
