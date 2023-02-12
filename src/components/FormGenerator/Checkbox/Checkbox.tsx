@@ -8,7 +8,7 @@ interface PropTypes {
 }
 
 function Checkbox(props: HTMLProps<HTMLInputElement> & PropTypes): JSX.Element {
-  const { errors, field } = props;
+  const { errors, field, ...otherProps } = props;
   const { label, name, fieldType } = field;
   return (
     <div className="flex flex-col justify-evenly m-4">
@@ -18,7 +18,7 @@ function Checkbox(props: HTMLProps<HTMLInputElement> & PropTypes): JSX.Element {
           type={fieldType}
           className="pr-4"
           id={name}
-          {...props}
+          {...otherProps}
         />
         <span className="ml-2">{label}</span>
       </div>
