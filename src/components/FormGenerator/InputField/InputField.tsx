@@ -12,13 +12,13 @@ interface PropTypes {
 function InputField(
   props: HTMLProps<HTMLInputElement> & PropTypes
 ): JSX.Element {
-  const { field, errors } = props;
+  const { field, errors, ...otherProps } = props;
   const { label, fieldType, name } = field;
 
   return (
     <div className="flex flex-col justify-around p-4 pb-0">
       <label htmlFor={name}>{label}</label>
-      <input type={fieldType} id={name} {...props} />
+      <input type={fieldType} id={name} {...otherProps} />
       <ErrorField errors={errors} />
     </div>
   );

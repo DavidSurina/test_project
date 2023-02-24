@@ -1,13 +1,9 @@
+import { validatePattern } from "./functions";
+
 export type PatternType = {
   pattern: string;
   errorMessage: string;
 };
-
-export function patternValidate(pattern: string, value: string) {
-  const regExp = new RegExp(pattern);
-  console.log(regExp.test(value), regExp, value);
-  return regExp.test(value);
-}
 
 export const validation: Record<
   string,
@@ -16,7 +12,7 @@ export const validation: Record<
     validate: (
       value: string | number,
       parameters?: unknown
-    ) => boolean | typeof patternValidate;
+    ) => boolean | typeof validatePattern;
   }
 > = {
   minLength: {
@@ -58,7 +54,7 @@ export type ValidationRulesType = {
 export type FormFieldType = {
   name: string;
   label: string;
-  fieldType: "text" | "email" | "password";
+  fieldType: "text" | "email" | "password" | "checkbox";
   validationRules: ValidationRulesType;
 };
 
@@ -143,7 +139,16 @@ const mockName: FormFieldType = {
   },
 };
 
+const mockCheckbox: FormFieldType = {
+  name: "i_agree_checkbox",
+  label: "I agree to general terms",
+  fieldType: "checkbox",
+  validationRules: {
+    isRequired: true,
+  },
+};
+
 export const mockObj_registration: DataObjectType = {
-  formFields: [mockEmail, mockName, mockPw, mockPwRepeat],
+  formFields: [mockEmail, mockName, mockPw, mockPwRepeat, mockCheckbox],
   submitBtnLabel: "Registration",
 };

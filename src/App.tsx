@@ -12,11 +12,6 @@ function App() {
       <Routes>
         <Route path="/" element={<Navbar />}>
           <Route
-            index
-            path="mock1"
-            element={<FormGenerator dataObject={mockObj_registration} />}
-          />
-          <Route
             path="mock1"
             element={<FormGenerator dataObject={mockObj_registration} />}
           />
