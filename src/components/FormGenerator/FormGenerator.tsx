@@ -19,7 +19,14 @@ function FormGenerator(props: PropTypes): JSX.Element {
     console.log("submitted", values);
   };
 
-  const { handleChange, handleSumbit, values, errors, handleBlur } = useForm({
+  const {
+    handleChange,
+    handleSumbit,
+    values,
+    errors,
+    handleBlur,
+    cancelTimeout,
+  } = useForm({
     dataObject,
     onSubmit,
   });
@@ -56,6 +63,7 @@ function FormGenerator(props: PropTypes): JSX.Element {
         >
           {submitBtnLabel}
         </button>
+        <button onClick={cancelTimeout}>Cancel timeout</button>
       </>
     </form>
   );
