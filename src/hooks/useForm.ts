@@ -1,13 +1,14 @@
-import { useState, ChangeEvent, FormEvent, FocusEvent } from "react";
+import { useState, useEffect, ChangeEvent, FormEvent, FocusEvent } from "react";
 
 import { ErrorsType, ValuesType } from "../components/FormGenerator/types";
-import { validatePatterns } from "../globals/functions";
+import { testLog, validatePatterns } from "../globals/functions";
 import {
   DataObjectType,
   FormFieldType,
   PatternType,
   validation,
 } from "../globals/mockObjects";
+import useDebounce from "./useDebounce";
 
 export type UseFormProps<T> = {
   dataObject: DataObjectType;
@@ -19,6 +20,12 @@ const useForm = <T>({ dataObject, onSubmit }: UseFormProps<T>) => {
 
   const [values, setValues] = useState<ValuesType>({});
   const [errors, setErrors] = useState<ErrorsType>({});
+
+  const { isReady, cancel } = useDebounce(testLog, 5000, [values]);
+
+  useEffect(() => {
+    console.log(isReady);
+  }, [isReady]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { id, value, checked, type } = e.target;
@@ -101,6 +108,11 @@ const useForm = <T>({ dataObject, onSubmit }: UseFormProps<T>) => {
     }
   };
 
+  const cancelTimeout = () => {
+    cancel();
+    console.log("timeout cancelled");
+  };
+
   const handleSumbit = (e: FormEvent) => {
     e.preventDefault();
     // validation
@@ -112,7 +124,8 @@ const useForm = <T>({ dataObject, onSubmit }: UseFormProps<T>) => {
       return;
     } else if (onSubmit) {
       // on submit
-      onSubmit(values);
+      // onSubmit(values);
+      console.log(values + "submitted");
     }
   };
 
@@ -122,6 +135,7 @@ const useForm = <T>({ dataObject, onSubmit }: UseFormProps<T>) => {
     values,
     errors,
     handleBlur,
+    cancelTimeout,
   };
 };
 

@@ -15,3 +15,7 @@ export function validatePattern(pattern: string, value: string) {
 
   return regExp.test(value);
 }
+
+export function testLog() {
+  console.log("This was fired");
+}
